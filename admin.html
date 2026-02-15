@@ -390,6 +390,11 @@
             color: white;
         }
 
+        .status-archived {
+            background: #7f8c8d;
+            color: white;
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -974,6 +979,9 @@
                         <button class="btn btn-danger" onclick="exportMembers('pdf')">
                             <i class="fas fa-file-pdf"></i> PDF
                         </button>
+                        <button class="btn btn-warning" id="showArchivedBtn" onclick="toggleArchived()">
+                            <i class="fas fa-archive"></i> আর্কাইভ দেখান
+                        </button>
                     </div>
                 </div>
 
@@ -993,6 +1001,7 @@
                     <table id="membersTable">
                         <thead>
                             <tr>
+                                <th><input type="checkbox" id="selectAllMembers" onclick="toggleSelectAllMembers()"></th>
                                 <th>ছবি</th>
                                 <th>নাম</th>
                                 <th>ইমেইল</th>
@@ -1001,6 +1010,7 @@
                                 <th>ইউনিট</th>
                                 <th>উপদল</th>
                                 <th>ব্যাজ</th>
+                                <th>স্ট্যাটাস</th>
                                 <th>অ্যাকশন</th>
                             </tr>
                         </thead>
@@ -1008,6 +1018,15 @@
                             <!-- Will be populated dynamically -->
                         </tbody>
                     </table>
+                </div>
+
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-warning" onclick="archiveSelectedMembers()">
+                        <i class="fas fa-archive"></i> নির্বাচিত আর্কাইভ
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSelectedMembers()">
+                        <i class="fas fa-trash"></i> নির্বাচিত ডিলিট
+                    </button>
                 </div>
             </div>
 
@@ -1287,6 +1306,7 @@
         let selectedMembers = new Set();
         let emailRecipients = new Set();
         let charts = {};
+        let showArchived = false;
 
         // ============ AUTHENTICATION ============
 
@@ -1488,6 +1508,11 @@
 
             let filteredMembers = members;
 
+            // Apply archive filter
+            if (!showArchived) {
+                filteredMembers = filteredMembers.filter(member => !member.archived);
+            }
+
             // Apply search filter
             if (searchTerm) {
                 filteredMembers = filteredMembers.filter(member => 
@@ -1505,6 +1530,7 @@
 
             tbody.innerHTML = filteredMembers.map(member => `
                 <tr>
+                    <td><input type="checkbox" class="member-checkbox" value="${member.id}" onchange="toggleMemberSelect('${member.id}')"></td>
                     <td><img src="${member.photo || 'https://via.placeholder.com/40'}" style="width: 40px; height: 40px; border-radius: 5px; object-fit: cover;"></td>
                     <td>${member.banglaName || member.fullName || 'N/A'}</td>
                     <td>${member.email || 'N/A'}</td>
@@ -1513,10 +1539,13 @@
                     <td>${getUnitName(member.unit)}</td>
                     <td>${getTeamName(member.team)}</td>
                     <td>${member.badges ? member.badges.length : 0}</td>
+                    <td>${member.archived ? '<span class="status-badge status-archived">আর্কাইভ করা হয়েছে</span>' : ''}</td>
                     <td>
                         <button class="btn btn-info" onclick="viewMemberProfile('${member.id}')"><i class="fas fa-eye"></i></button>
                         <button class="btn btn-primary" onclick="assignRank('${member.id}')"><i class="fas fa-medal"></i></button>
                         <button class="btn btn-warning" onclick="editMemberUnit('${member.id}')"><i class="fas fa-exchange-alt"></i></button>
+                        <button class="btn btn-secondary" onclick="archiveMember('${member.id}')"><i class="fas fa-archive"></i></button>
+                        <button class="btn btn-danger" onclick="deleteMember('${member.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -1546,7 +1575,7 @@
             const tbody = document.getElementById('badgeMembersTableBody');
             const searchTerm = document.getElementById('badgeSearch')?.value.toLowerCase() || '';
 
-            let filteredMembers = members;
+            let filteredMembers = members.filter(m => !m.archived);
             if (searchTerm) {
                 filteredMembers = filteredMembers.filter(member => 
                     (member.banglaName && member.banglaName.toLowerCase().includes(searchTerm)) ||
@@ -1569,6 +1598,146 @@
             `).join('');
         }
 
+        // ============ MEMBER DELETE AND ARCHIVE FUNCTIONS ============
+
+        async function deleteMember(memberId) {
+            if (!confirm('সদস্যকে সম্পূর্ণ ডিলিট করতে চান? এটি পুনরুদ্ধার করা যাবে না।')) return;
+            
+            showLoading();
+            try {
+                await db.collection('members').doc(memberId).delete();
+                await loadMembers();
+                hideLoading();
+                alert('✅ সদস্য ডিলিট করা হয়েছে');
+            } catch (error) {
+                console.error('Error deleting member:', error);
+                hideLoading();
+                alert('ডিলিট করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        }
+
+        async function archiveMember(memberId) {
+            if (!confirm('সদস্যকে আর্কাইভ করতে চান?')) return;
+            
+            showLoading();
+            try {
+                await db.collection('members').doc(memberId).update({
+                    archived: true,
+                    archivedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                await loadMembers();
+                hideLoading();
+                alert('✅ সদস্য আর্কাইভ করা হয়েছে');
+            } catch (error) {
+                console.error('Error archiving member:', error);
+                hideLoading();
+                alert('আর্কাইভ করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        }
+
+        async function unarchiveMember(memberId) {
+            if (!confirm('সদস্যকে পুনরায় সক্রিয় করতে চান?')) return;
+            
+            showLoading();
+            try {
+                await db.collection('members').doc(memberId).update({
+                    archived: false
+                });
+                await loadMembers();
+                hideLoading();
+                alert('✅ সদস্য পুনরায় সক্রিয় করা হয়েছে');
+            } catch (error) {
+                console.error('Error unarchiving member:', error);
+                hideLoading();
+                alert('পুনরায় সক্রিয় করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        }
+
+        function toggleMemberSelect(memberId) {
+            const checkbox = document.querySelector(`.member-checkbox[value="${memberId}"]`);
+            if (checkbox.checked) {
+                selectedMembers.add(memberId);
+            } else {
+                selectedMembers.delete(memberId);
+            }
+        }
+
+        function toggleSelectAllMembers() {
+            const selectAll = document.getElementById('selectAllMembers');
+            const checkboxes = document.querySelectorAll('.member-checkbox');
+            
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+                if (selectAll.checked) {
+                    selectedMembers.add(cb.value);
+                } else {
+                    selectedMembers.delete(cb.value);
+                }
+            });
+        }
+
+        async function archiveSelectedMembers() {
+            if (selectedMembers.size === 0) {
+                alert('কোনো সদস্য নির্বাচন করা হয়নি');
+                return;
+            }
+            
+            if (!confirm(`${selectedMembers.size} জন সদস্যকে আর্কাইভ করতে চান?`)) return;
+            
+            showLoading();
+            try {
+                for (const memberId of selectedMembers) {
+                    await db.collection('members').doc(memberId).update({
+                        archived: true,
+                        archivedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                selectedMembers.clear();
+                document.getElementById('selectAllMembers').checked = false;
+                await loadMembers();
+                hideLoading();
+                alert('✅ নির্বাচিত সদস্যরা আর্কাইভ করা হয়েছে');
+            } catch (error) {
+                console.error('Error archiving selected members:', error);
+                hideLoading();
+                alert('আর্কাইভ করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        }
+
+        async function deleteSelectedMembers() {
+            if (selectedMembers.size === 0) {
+                alert('কোনো সদস্য নির্বাচন করা হয়নি');
+                return;
+            }
+            
+            if (!confirm(`${selectedMembers.size} জন সদস্যকে সম্পূর্ণ ডিলিট করতে চান? এটি পুনরুদ্ধার করা যাবে না।`)) return;
+            
+            showLoading();
+            try {
+                for (const memberId of selectedMembers) {
+                    await db.collection('members').doc(memberId).delete();
+                }
+                selectedMembers.clear();
+                document.getElementById('selectAllMembers').checked = false;
+                await loadMembers();
+                hideLoading();
+                alert('✅ নির্বাচিত সদস্যরা ডিলিট করা হয়েছে');
+            } catch (error) {
+                console.error('Error deleting selected members:', error);
+                hideLoading();
+                alert('ডিলিট করতে সমস্যা হয়েছে: ' + error.message);
+            }
+        }
+
+        function toggleArchived() {
+            showArchived = !showArchived;
+            const btn = document.getElementById('showArchivedBtn');
+            btn.innerHTML = showArchived ? 
+                '<i class="fas fa-eye-slash"></i> সক্রিয় সদস্য দেখান' : 
+                '<i class="fas fa-archive"></i> আর্কাইভ দেখান';
+            displayMembers();
+        }
+
         // ============ UNIT MANAGEMENT ============
 
         function updateUnitGrid() {
@@ -1576,7 +1745,7 @@
             const units = ['ইউনিট ১', 'ইউনিট ২', 'ইউনিট ৩', 'ইউনিট ৪'];
             
             unitGrid.innerHTML = units.map((unit, index) => {
-                const unitMembers = members.filter(m => m.unit === `unit${index + 1}`);
+                const unitMembers = members.filter(m => m.unit === `unit${index + 1}` && !m.archived);
                 const unitNumber = index + 1;
                 
                 return `
@@ -1624,7 +1793,7 @@
             const tbody = document.getElementById('assignmentTableBody');
             const searchTerm = document.getElementById('assignmentSearch')?.value.toLowerCase() || '';
 
-            let filteredMembers = members;
+            let filteredMembers = members.filter(m => !m.archived);
             if (searchTerm) {
                 filteredMembers = filteredMembers.filter(member => 
                     (member.banglaName && member.banglaName.toLowerCase().includes(searchTerm)) ||
@@ -1808,6 +1977,7 @@
                     unit: 'unit1',
                     team: 'team1',
                     badges: [],
+                    archived: false,
                     joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
@@ -1931,6 +2101,7 @@
                         <p><i class="fas fa-envelope"></i> ${member.email}</p>
                         <p><i class="fas fa-phone"></i> ${member.mobile}</p>
                         <p><span class="rank-badge active">${member.rank || 'সদস্য'}</span></p>
+                        ${member.archived ? '<p><span class="status-badge status-archived">আর্কাইভ করা হয়েছে</span></p>' : ''}
                     </div>
                 </div>
                 
@@ -1949,6 +2120,11 @@
                 <div class="action-buttons" style="margin-top: 30px;">
                     <button class="btn btn-primary" onclick="assignRank('${member.id}')"><i class="fas fa-medal"></i> র‍্যাঙ্ক পরিবর্তন</button>
                     <button class="btn btn-warning" onclick="editMemberUnit('${member.id}')"><i class="fas fa-exchange-alt"></i> ইউনিট পরিবর্তন</button>
+                    ${member.archived ? 
+                        `<button class="btn btn-success" onclick="unarchiveMember('${member.id}')"><i class="fas fa-undo"></i> পুনরায় সক্রিয়</button>` : 
+                        `<button class="btn btn-secondary" onclick="archiveMember('${member.id}')"><i class="fas fa-archive"></i> আর্কাইভ</button>`
+                    }
+                    <button class="btn btn-danger" onclick="deleteMember('${member.id}')"><i class="fas fa-trash"></i> ডিলিট</button>
                     <button class="btn btn-info" onclick="exportProfileAsPNG('${member.id}')"><i class="fas fa-download"></i> PNG</button>
                 </div>
             `;
@@ -2006,6 +2182,7 @@
                         unit: 'unit1',
                         team: 'team1',
                         badges: [],
+                        archived: false,
                         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
@@ -2115,7 +2292,7 @@
         // ============ EMAIL FUNCTIONS ============
 
         function addAllRecipients() {
-            members.forEach(member => {
+            members.filter(m => !m.archived).forEach(member => {
                 if (member.email) {
                     emailRecipients.add(member.email);
                 }
@@ -2215,7 +2392,8 @@
                     'উপদল': getTeamName(m.team),
                     'ব্যাজ': m.badges ? m.badges.join(', ') : '',
                     'রক্তের গ্রুপ': m.bloodGroup,
-                    'জন্ম তারিখ': m.dob
+                    'জন্ম তারিখ': m.dob,
+                    'স্ট্যাটাস': m.archived ? 'আর্কাইভ' : 'সক্রিয়'
                 }));
 
                 if (type === 'csv') {
@@ -2326,6 +2504,7 @@
                     <img src="${member.photo || 'https://via.placeholder.com/100'}" style="width: 100px; height: 100px; border-radius: 10px; border: 3px solid #e94560;">
                     <h2 style="margin-top: 10px;">${member.banglaName || member.fullName}</h2>
                     <p>${member.rank || 'সদস্য'}</p>
+                    ${member.archived ? '<p><span style="background: #7f8c8d; padding: 3px 10px; border-radius: 20px;">আর্কাইভ</span></p>' : ''}
                 </div>
                 <div style="margin-bottom: 10px;">
                     <p><i class="fas fa-envelope"></i> ${member.email || 'N/A'}</p>
@@ -2487,7 +2666,7 @@
             
             // Update unit chart
             const unitCounts = [0, 0, 0, 0];
-            members.forEach(m => {
+            members.filter(m => !m.archived).forEach(m => {
                 const unitIndex = parseInt(m.unit?.replace('unit', '') || '1') - 1;
                 if (unitIndex >= 0 && unitIndex < 4) unitCounts[unitIndex]++;
             });
@@ -2502,7 +2681,7 @@
                 'সহকারী রোভার মেট': 0,
                 'সিনিয়র রোভার মেট': 0
             };
-            members.forEach(m => {
+            members.filter(m => !m.archived).forEach(m => {
                 if (rankCounts[m.rank] !== undefined) rankCounts[m.rank]++;
                 else rankCounts['সদস্য']++;
             });
@@ -2511,7 +2690,7 @@
 
             // Update badge chart
             const badgeCounts = [0, 0, 0, 0, 0];
-            members.forEach(m => {
+            members.filter(m => !m.archived).forEach(m => {
                 if (m.badges) {
                     if (m.badges.includes('সহচর স্তর')) badgeCounts[0]++;
                     if (m.badges.includes('সদস্য স্তর')) badgeCounts[1]++;
@@ -2687,6 +2866,16 @@
         window.exportAllProfiles = exportProfileCards;
         window.saveSettings = saveSettings;
         window.closeModal = closeModal;
+        
+        // Member Delete/Archive Functions
+        window.deleteMember = deleteMember;
+        window.archiveMember = archiveMember;
+        window.unarchiveMember = unarchiveMember;
+        window.toggleMemberSelect = toggleMemberSelect;
+        window.toggleSelectAllMembers = toggleSelectAllMembers;
+        window.archiveSelectedMembers = archiveSelectedMembers;
+        window.deleteSelectedMembers = deleteSelectedMembers;
+        window.toggleArchived = toggleArchived;
         
         // Unit Management Functions
         window.openUnitAssignmentModal = openUnitAssignmentModal;
