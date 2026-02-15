@@ -681,7 +681,410 @@
             <a href="index.html"><i class="fas fa-home"></i> <span>হোম</span></a>
             <a href="members.html"><i class="fas fa-users"></i> <span>সদস্য</span></a>
             <a href="#" class="active"><i class="fas fa-droplet"></i> <span>রক্তদাতা</span></a>
-            <a href="https://wa.me/8801612018221" class="btn-emergency" target="_blank"><i class="fas fa-exclamation-triangle"></i> <span>জরুরি প্রয়োজন</span></a>
+            <!-- বাটন যা পপ-আপ খুলবে -->
+<a href="javascript:void(0)" onclick="openBloodRequestForm()" class="btn-emergency" target="_blank">
+  <i class="fas fa-exclamation-triangle"></i> 
+  <span>জরুরি প্রয়োজন</span>
+</a>
+
+<!-- পপ-আপ ফর্ম -->
+<div id="bloodRequestPopup" class="popup-overlay" style="display: none;">
+  <div class="popup-content">
+    <span class="close-btn" onclick="closeBloodRequestForm()">&times;</span>
+    
+    <div class="popup-header">
+      <h2>🩸 জরুরি রক্তের প্রয়োজন</h2>
+    </div>
+    
+    <form id="bloodRequestForm" onsubmit="sendBloodRequest(event)">
+      <div class="form-group">
+        <label>👤 রোগীর নাম:</label>
+        <input type="text" id="patientName" required>
+      </div>
+      
+      <div class="form-group">
+        <label>🩸 ব্লাড গ্রুপ:</label>
+        <select id="bloodGroup" required>
+          <option value="">সিলেক্ট করুন</option>
+          <option value="A+">A+</option>
+          <option value="A-">A-</option>
+          <option value="B+">B+</option>
+          <option value="B-">B-</option>
+          <option value="O+">O+</option>
+          <option value="O-">O-</option>
+          <option value="AB+">AB+</option>
+          <option value="AB-">AB-</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>📦 ইউনিট/ব্যাগ:</label>
+        <input type="number" id="units" min="1" max="10" required>
+      </div>
+      
+      <div class="form-group">
+        <label>🏥 হাসপাতালের নাম:</label>
+        <input type="text" id="hospital" required>
+      </div>
+      
+      <div class="form-group">
+        <label>📍 ঠিকানা:</label>
+        <input type="text" id="address" required>
+      </div>
+      
+      <div class="form-group">
+        <label>💉 রোগীর অবস্থা:</label>
+        <input type="text" id="condition" placeholder="যেমন: অপারেশন, দুর্ঘটনা ইত্যাদি" required>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group half">
+          <label>📅 তারিখ:</label>
+          <input type="date" id="requestDate" required>
+        </div>
+        
+        <div class="form-group half">
+          <label>⏰ সময়:</label>
+          <input type="time" id="requestTime" required>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>📞 রোগীর পরিবারের কন্টাক্ট নাম্বার:</label>
+        <input type="tel" id="contactNumber" required>
+      </div>
+      
+      <div class="form-group">
+        <label>📱 আপনার ফোন নাম্বার:</label>
+        <input type="tel" id="phoneNumber" required>
+      </div>
+      
+      <div class="form-group">
+        <label>🔊 জরুরিতা:</label>
+        <select id="urgency" required>
+          <option value="অতি জরুরি">অতি জরুরি</option>
+          <option value="জরুরি">জরুরি</option>
+          <option value="সাধারণ">সাধারণ</option>
+        </select>
+      </div>
+      
+      <div class="info-box">
+        <p>🙏 আপনি যেভাবে সাহায্য করতে পারেন:</p>
+        <ol>
+          <li>যোগ্য এবং উপলব্ধ থাকলে উপরের নাম্বারে সাথে সাথে যোগাযোগ করুন।</li>
+          <li>পোস্টটি শেয়ার করুন, একটি জীবন বাঁচান।</li>
+        </ol>
+        <p class="footer-note">💖 গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ দায়িত্বশীলতার সাথে শেয়ার করার পরামর্শ দেয়।</p>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="send-btn">📤 Send Request</button>
+        <button type="button" class="cancel-btn" onclick="closeBloodRequestForm()">বাতিল</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+/* পপ-আপ স্টাইল */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.popup-content {
+  background-color: white;
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  position: relative;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {transform: translateY(-50px); opacity: 0;}
+  to {transform: translateY(0); opacity: 1;}
+}
+
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-btn:hover {
+  color: #ff0000;
+}
+
+.popup-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ff4444;
+  padding-bottom: 10px;
+}
+
+.popup-header h2 {
+  color: #d32f2f;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.form-group.half {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #d32f2f;
+}
+
+.info-box {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 20px 0;
+  border-left: 4px solid #d32f2f;
+}
+
+.info-box ol {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.footer-note {
+  font-style: italic;
+  color: #666;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.send-btn {
+  flex: 2;
+  background-color: #25D366;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.send-btn:hover {
+  background-color: #128C7E;
+}
+
+.cancel-btn {
+  flex: 1;
+  background-color: #dc3545;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.cancel-btn:hover {
+  background-color: #c82333;
+}
+
+.btn-emergency {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #dc3545;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.btn-emergency:hover {
+  background-color: #c82333;
+}
+
+/* মোবাইল ডিভাইসের জন্য রেসপন্সিভ */
+@media (max-width: 600px) {
+  .popup-content {
+    margin: 15px;
+    padding: 15px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-group.half {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+function openBloodRequestForm() {
+  document.getElementById('bloodRequestPopup').style.display = 'block';
+  document.body.style.overflow = 'hidden'; // স্ক্রল বন্ধ
+  
+  // বর্তমান তারিখ এবং সময় সেট করা
+  setCurrentDateTime();
+}
+
+function closeBloodRequestForm() {
+  document.getElementById('bloodRequestPopup').style.display = 'none';
+  document.body.style.overflow = 'auto'; // স্ক্রল চালু
+}
+
+function setCurrentDateTime() {
+  const now = new Date();
+  
+  // তারিখ ফরম্যাট YYYY-MM-DD
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const currentDate = `${year}-${month}-${day}`;
+  
+  // সময় ফরম্যাট HH:MM
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const currentTime = `${hours}:${minutes}`;
+  
+  document.getElementById('requestDate').value = currentDate;
+  document.getElementById('requestTime').value = currentTime;
+}
+
+function formatBanglaDateTime(dateStr, timeStr) {
+  const months = {
+    '01': 'জানুয়ারি', '02': 'ফেব্রুয়ারি', '03': 'মার্চ',
+    '04': 'এপ্রিল', '05': 'মে', '06': 'জুন',
+    '07': 'জুলাই', '08': 'আগস্ট', '09': 'সেপ্টেম্বর',
+    '10': 'অক্টোবর', '11': 'নভেম্বর', '12': 'ডিসেম্বর'
+  };
+  
+  const [year, month, day] = dateStr.split('-');
+  const banglaDate = `${parseInt(day)} ${months[month]} ${year}`;
+  
+  // 24 ঘন্টা থেকে 12 ঘন্টা ফরম্যাটে পরিবর্তন
+  let [hours, minutes] = timeStr.split(':');
+  hours = parseInt(hours);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 কে 12 হিসেবে দেখাবে
+  const banglaTime = `${hours}:${minutes} ${ampm}`;
+  
+  return { date: banglaDate, time: banglaTime };
+}
+
+function sendBloodRequest(event) {
+  event.preventDefault(); // ফর্ম সাবমিট বন্ধ
+  
+  // ফর্মের ভ্যালু সংগ্রহ
+  const patient = document.getElementById('patientName').value;
+  const bloodGroup = document.getElementById('bloodGroup').value;
+  const units = document.getElementById('units').value;
+  const hospital = document.getElementById('hospital').value;
+  const address = document.getElementById('address').value;
+  const condition = document.getElementById('condition').value;
+  const date = document.getElementById('requestDate').value;
+  const time = document.getElementById('requestTime').value;
+  const contact = document.getElementById('contactNumber').value;
+  const phone = document.getElementById('phoneNumber').value;
+  const urgency = document.getElementById('urgency').value;
+  
+  // বাংলা তারিখ ও সময় ফরম্যাট করা
+  const { date: banglaDate, time: banglaTime } = formatBanglaDateTime(date, time);
+  
+  // WhatsApp মেসেজ তৈরি
+  const message = `🩸 *জরুরি রক্তের প্রয়োজন* 🩸
+
+👤 *রোগী:* ${patient}
+🩸 *ব্লাড গ্রুপ:* ${bloodGroup}
+📦 *ইউনিট/ব্যাগ:* ${units}
+🏥 *হাসপাতাল:* ${hospital}
+📍 *ঠিকানা:* ${address}
+💉 *অবস্থা:* ${condition}
+📅 *তারিখ:* ${banglaDate}
+⏰ *সময়:* ${banglaTime}
+📞 *যোগাযোগ:* ${contact}
+📱 *আপনার ফোন:* ${phone}
+🔊 *জরুরিতা:* ${urgency}
+
+🙏 *আপনি যেভাবে সাহায্য করতে পারেন:*
+1️⃣ যোগ্য এবং উপলব্ধ থাকলে উপরের নাম্বারে সাথে সাথে যোগাযোগ করুন।
+2️⃣ পোস্টটি শেয়ার করুন, একটি জীবন বাঁচান।
+
+💖 গুরুদয়াল গভঃ কলেজ রোভার স্কাউট গ্রুপ দায়িত্বশীলতার সাথে শেয়ার করার পরামর্শ দেয়।
+🔗 https://gdgcrsg.github.io/portal/`;
+
+  // WhatsApp URL এনকোড
+  const whatsappUrl = `https://wa.me/+8801612018221?text=${encodeURIComponent(message)}`;
+  
+  // নতুন ট্যাবে WhatsApp খুলবে
+  window.open(whatsappUrl, '_blank');
+  
+  // ফর্ম বন্ধ
+  closeBloodRequestForm();
+  
+  // ফর্ম রিসেট
+  document.getElementById('bloodRequestForm').reset();
+  
+  return false;
+}
+
+// পপ-আপের বাইরে ক্লিক করলে বন্ধ হবে
+window.onclick = function(event) {
+  const popup = document.getElementById('bloodRequestPopup');
+  if (event.target == popup) {
+    closeBloodRequestForm();
+  }
+}
+</script>
         </div>
     </nav>
 
@@ -761,11 +1164,9 @@
                 <img src="https://i.ibb.co/KHwCKpF/1000003810.png" alt="Rover Logo">
                 <span>গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</span>
             </div>
-            <div>
-                <span class="emergency-note"><i class="fas fa-phone-alt"></i> জরুরি : 01777-000000</span>
-            </div>
+            
         </div>
-        <div style="text-align:center; margin-top:3rem; opacity:0.6;">© <span id="currentYear"></span> গুরুদয়াল কলেজ রোভার — রক্ত দিন,জীবন বাঁচান।</div>
+        <div style="text-align:center; margin-top:3rem; opacity:0.6;">© <span id="currentYear"></span> গুরুদয়াল কলেজ রোভার — রক্ত দিন, জীবন বাঁচান।</div>
 
 <script>
     document.getElementById('currentYear').innerText = new Date().getFullYear();
