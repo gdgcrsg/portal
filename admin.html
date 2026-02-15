@@ -916,10 +916,10 @@
                     </select>
                     <select class="filter-select" id="teamFilter" onchange="filterByTeam()">
                         <option value="">সকল উপদল</option>
-                        <option value="team1">উপদল ১</option>
-                        <option value="team2">উপদল ২</option>
-                        <option value="team3">উপদল ৩</option>
-                        <option value="team4">উপদল ৪</option>
+                        <option value="team1">বিশ্বাসী</option>
+                        <option value="team2">বন্ধু</option>
+                        <option value="team3">বিনয়ী</option>
+                        <option value="team4">সদয়</option>
                     </select>
                 </div>
 
@@ -1534,10 +1534,10 @@
 
         function getTeamName(team) {
             const teamMap = {
-                'team1': 'উপদল ১',
-                'team2': 'উপদল ২',
-                'team3': 'উপদল ৩',
-                'team4': 'উপদল ৪'
+                'team1': 'বিশ্বাসী',
+                'team2': 'বন্ধু',
+                'team3': 'বিনয়ী',
+                'team4': 'সদয়'
             };
             return teamMap[team] || team || 'নিয়োগ হয়নি';
         }
@@ -1648,10 +1648,10 @@
                     </td>
                     <td>
                         <select class="team-select" id="team_${member.id}">
-                            <option value="team1" ${member.team === 'team1' ? 'selected' : ''}>উপদল ১</option>
-                            <option value="team2" ${member.team === 'team2' ? 'selected' : ''}>উপদল ২</option>
-                            <option value="team3" ${member.team === 'team3' ? 'selected' : ''}>উপদল ৩</option>
-                            <option value="team4" ${member.team === 'team4' ? 'selected' : ''}>উপদল ৪</option>
+                            <option value="team1" ${member.team === 'team1' ? 'selected' : ''}>বিশ্বাসী</option>
+                            <option value="team2" ${member.team === 'team2' ? 'selected' : ''}>বন্ধু</option>
+                            <option value="team3" ${member.team === 'team3' ? 'selected' : ''}>বিনয়ী</option>
+                            <option value="team4" ${member.team === 'team4' ? 'selected' : ''}>সদয়</option>
                         </select>
                     </td>
                     <td>
