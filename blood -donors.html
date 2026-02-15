@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>রক্তদাতা তালিকা - গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter & Hind Siliguri -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* (previous styles identical – no visual change, just functionality) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background: #f5f7fc;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+            padding: 0.9rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            height: 45px;
+            width: 45px;
+            border-radius: 50%;
+            border: 2px solid #e53e3e;
+        }
+
+        .logo span {
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(145deg, #b91c1c, #7f1d1d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #2d3748;
+            font-weight: 500;
+            transition: 0.2s;
+            font-size: 1.05rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #c53030;
+        }
+
+        .nav-links a i {
+            margin-right: 6px;
+        }
+
+        .btn-emergency {
+            background: #dc2626;
+            color: white !important;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            box-shadow: 0 6px 14px rgba(220,38,38,0.3);
+        }
+
+        .btn-emergency:hover {
+            background: #b91c1c;
+            transform: scale(1.02);
+        }
+
+        .hero-blood {
+            background: linear-gradient(112deg, #fff1f0 0%, #ffe9e8 100%);
+            padding: 3rem 2rem;
+            border-radius: 0 0 3rem 3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-blood::before {
+            content: "\f043";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 5%;
+            top: 20%;
+            font-size: 15rem;
+            color: rgba(229, 62, 62, 0.1);
+            transform: rotate(15deg);
+        }
+
+        .hero-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+            gap: 2rem;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            background: linear-gradient(145deg, #7f1d1d, #b91c1c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: #4a5568;
+            max-width: 600px;
+            margin: 1.5rem 0;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            border-radius: 28px;
+            padding: 1rem 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #b22222;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .hero-image i {
+            font-size: 10rem;
+            color: #e53e3e;
+            opacity: 0.3;
+        }
+
+        .filter-panel {
+            max-width: 1300px;
+            margin: 0 auto 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 60px;
+            padding: 0.8rem 1rem 0.8rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .search-section i {
+            color: #c53030;
+            font-size: 1.3rem;
+        }
+
+        .search-section input {
+            border: none;
+            flex: 2;
+            min-width: 240px;
+            font-size: 1.1rem;
+            padding: 0.8rem 0;
+            outline: none;
+            background: transparent;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        .blood-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+            margin-left: auto;
+            justify-content: flex-end;
+        }
+
+        .blood-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .blood-btn i {
+            font-size: 1rem;
+            color: #b91c1c;
+        }
+
+        .blood-btn.active {
+            background: #c53030;
+            color: white;
+        }
+
+        .blood-btn.active i {
+            color: white;
+        }
+
+        .blood-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .blood-btn.blood-a { background: #fee2e2; color: #991b1b; }
+        .blood-btn.blood-b { background: #dbeafe; color: #1e40af; }
+        .blood-btn.blood-o { background: #dcfce7; color: #166534; }
+        .blood-btn.blood-ab { background: #f3e8ff; color: #6b21a8; }
+
+        .donor-grid {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .donor-card {
+            background: white;
+            border-radius: 30px;
+            padding: 1.8rem 1.5rem;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #fff;
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .donor-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 45px rgba(190, 40, 40, 0.12);
+            border-color: #fecaca;
+        }
+
+        .blood-type-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #c53030;
+            color: white;
+            font-weight: 800;
+            font-size: 1.6rem;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 6px 12px rgba(199,0,0,0.3);
+            border: 3px solid white;
+            z-index: 5;
+        }
+
+        .donor-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .avatar {
+            background: linear-gradient(145deg, #dc2626, #991b1b);
+            width: 70px;
+            height: 70px;
+            border-radius: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            box-shadow: 0 6px 14px #e5535320;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .donor-name h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+
+        .donor-name p {
+            color: #dc2626;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .donor-details {
+            margin: 1.2rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1rem;
+            color: #334155;
+            word-break: break-word;
+        }
+
+        .detail-row i {
+            width: 24px;
+            color: #b91c1c;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.8rem 0 1.2rem;
+        }
+
+        .badge {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            flex-wrap: wrap;
+        }
+
+        .btn-contact {
+            background: #dc2626;
+            border: none;
+            color: white;
+            flex: 1 1 auto;
+            padding: 12px 8px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border: 1px solid #dc2626;
+            text-decoration: none;
+            min-width: 40px;
+        }
+
+        .btn-contact i {
+            font-size: 1.1rem;
+        }
+
+        .btn-contact:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            border-color: #25D366;
+        }
+        .btn-whatsapp:hover {
+            background: #20bd5a;
+            border-color: #20bd5a;
+        }
+
+        .btn-call {
+            background: white;
+            color: #b91c1c;
+            border: 2px solid #fecaca;
+        }
+        .btn-call:hover {
+            background: #fee2e2;
+            border-color: #dc2626;
+        }
+
+        .btn-facebook {
+            background: #1877f2;
+            border-color: #1877f2;
+        }
+        .btn-facebook:hover {
+            background: #0d5ab9;
+            border-color: #0d5ab9;
+        }
+
+        .btn-icon-only {
+            flex: 0 0 auto;
+            width: 48px;
+            padding: 12px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 450px;
+            width: 90%;
+            border-radius: 48px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 40px 70px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .modal-card h2 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .modal-blood {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: #b91c1c;
+            display: inline-block;
+            padding: 0.5rem 2rem;
+            border-radius: 60px;
+            color: white;
+            margin: 1rem 0;
+        }
+
+        .modal-detail {
+            background: #f1f5f9;
+            border-radius: 60px;
+            padding: 0.8rem;
+            margin: 1.5rem 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .close-modal {
+            background: #e2e8f0;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        .no-result {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem;
+            font-size: 1.4rem;
+            color: #64748b;
+            background: white;
+            border-radius: 30px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 4rem;
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f1f5f9;
+            border-top: 5px solid #dc2626;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: #0b1120;
+            color: #a0aec0;
+            padding: 3rem 2rem;
+            margin-top: 2rem;
+            border-radius: 3rem 3rem 0 0;
+        }
+
+        .footer-content {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .emergency-note {
+            background: #991b1b;
+            color: white;
+            padding: 1rem 3rem;
+            border-radius: 60px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            border: 2px solid #e53e3e;
+        }
+
+        .footer-logo span {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            .nav-links {
+                gap: 1rem;
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+            .hero-text h1 {
+                font-size: 2.2rem;
+            }
+            .hero-image i {
+                font-size: 6rem;
+            }
+            .blood-filter {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+            }
+            .donor-grid {
+                grid-template-columns: 1fr;
+                padding: 0 1rem 2rem;
+            }
+            .filter-panel {
+                padding: 0 1rem;
+            }
+            .search-section {
+                padding: 0.8rem 1rem;
+            }
+            .btn-emergency span {
+                display: none;
+            }
+            .btn-emergency i {
+                margin-right: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-stats {
+                justify-content: center;
+            }
+            .stat-item {
+                min-width: 120px;
+                padding: 0.8rem 1rem;
+            }
+            .donor-header {
+                flex-wrap: wrap;
+            }
+            .contact-actions .btn-contact span {
+                display: none;
+            }
+            .contact-actions .btn-contact i {
+                margin: 0;
+            }
+            .btn-icon-only {
+                width: 44px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation - same as original -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="https://i.ibb.co/KHwCKpF/1000003810.png" alt="Rover Logo">
+            <span>গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html"><i class="fas fa-home"></i> <span>হোম</span></a>
+            <a href="members.html"><i class="fas fa-users"></i> <span>সদস্য</span></a>
+            <a href="#" class="active"><i class="fas fa-droplet"></i> <span>রক্তদাতা</span></a>
+            <a href="https://wa.me/8801612018221" class="btn-emergency" target="_blank"><i class="fas fa-exclamation-triangle"></i> <span>জরুরি প্রয়োজন</span></a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-blood">
+        <div class="hero-container" style="display: flex; justify-content: center; align-items: center;">
+            <div class="hero-text" style="text-align: center;">
+                <h1>রক্তদাতাদের তালিকা<br>গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</h1>
+                <p><i class="fas fa-check-circle" style="color:#dc2626;"></i> আমাদের স্বেচ্ছাসেবী রক্তদাতারা ২৪/৭ সহায়তার জন্য প্রস্তুত। সরাসরি যোগাযোগ করুন, জীবন বাঁচান।</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalDonors">0</div>
+                        <div class="stat-label">মোট রক্তদাতা</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="activeDonors">0</div>
+                        <div class="stat-label">সক্রিয় সদস্য</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="bloodGroupsCount">0</div>
+                        <div class="stat-label">ব্লাড গ্রুপ</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <i class="fas fa-hand-holding-heart"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel">
+        <div class="search-section">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="নাম, এলাকা বা মোবাইল নম্বর খুঁজুন...">
+            <div class="blood-filter" id="bloodFilterGroup">
+                <button class="blood-btn active" data-blood="all"><i class="fas fa-tint"></i> সব</button>
+                <button class="blood-btn blood-a" data-blood="A+">A+</button>
+                <button class="blood-btn blood-a" data-blood="A-">A-</button>
+                <button class="blood-btn blood-b" data-blood="B+">B+</button>
+                <button class="blood-btn blood-b" data-blood="B-">B-</button>
+                <button class="blood-btn blood-ab" data-blood="AB+">AB+</button>
+                <button class="blood-btn blood-ab" data-blood="AB-">AB-</button>
+                <button class="blood-btn blood-o" data-blood="O+">O+</button>
+                <button class="blood-btn blood-o" data-blood="O-">O-</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+        <p>রক্তদাতাদের তথ্য লোড হচ্ছে...</p>
+    </div>
+
+    <!-- Donor Grid -->
+    <div id="donorGrid" class="donor-grid"></div>
+
+    <!-- Contact Modal (unchanged) -->
+    <div class="modal" id="contactModal">
+        <div class="modal-card">
+            <h2><i class="fas fa-heart" style="color:#dc2626;"></i> যোগাযোগ</h2>
+            <div class="modal-blood" id="modalBlood">A+</div>
+            <div id="modalName" style="font-size:2rem; font-weight:700; font-family:'Hind Siliguri';">নাম</div>
+            <div class="modal-detail" id="modalPhone">+880 1XXXXXXXXX</div>
+            <div class="modal-detail" id="modalEmail" style="margin-top:10px; font-size:1.2rem;">📧 ইমেইল</div>
+            <div style="margin:10px 0 20px;" id="modalAddress">📍 ঠিকানা</div>
+            <button class="btn-contact" style="width:100%;" id="callDirectBtn"><i class="fas fa-phone"></i> কল করুন</button>
+            <button class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i> বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://i.ibb.co/KHwCKpF/1000003810.png" alt="Rover Logo">
+                <span>গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</span>
+            </div>
+            <div>
+                <span class="emergency-note"><i class="fas fa-phone-alt"></i> জরুরি : 01777-000000</span>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:3rem; opacity:0.6;">© <span id="currentYear"></span> গুরুদয়াল কলেজ রোভার — রক্ত দিন,জীবন বাঁচান।</div>
+
+<script>
+    document.getElementById('currentYear').innerText = new Date().getFullYear();
+</script>
+    </footer>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyArcCRb1EBdaRcTGOnzvWqA5iTJNE1XmQE",
+            authDomain: "gdgcrover.firebaseapp.com",
+            projectId: "gdgcrover",
+            storageBucket: "gdgcrover.firebasestorage.app",
+            messagingSenderId: "80583939799",
+            appId: "1:80583939799:web:4eb60be176d2750955c292"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Global state
+        let allDonors = [];
+        let filteredDonors = [];
+        let currentBloodFilter = 'all';
+        let searchText = '';
+
+        // DOM elements
+        const grid = document.getElementById('donorGrid');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const searchInput = document.getElementById('searchInput');
+        const modal = document.getElementById('contactModal');
+        const modalBlood = document.getElementById('modalBlood');
+        const modalName = document.getElementById('modalName');
+        const modalPhone = document.getElementById('modalPhone');
+        const modalEmail = document.getElementById('modalEmail');
+        const modalAddress = document.getElementById('modalAddress');
+        const callDirectBtn = document.getElementById('callDirectBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        // Stats elements
+        const totalDonorsSpan = document.getElementById('totalDonors');
+        const activeDonorsSpan = document.getElementById('activeDonors');
+        const bloodGroupsCountSpan = document.getElementById('bloodGroupsCount');
+
+        // ---------- HELPER: clean phone number for tel: and whatsapp ----------
+        function cleanPhoneForTel(phoneRaw) {
+            if (!phoneRaw || phoneRaw === 'No Number' || phoneRaw === 'নম্বর নেই') return '';
+            // extract digits and plus
+            let cleaned = phoneRaw.replace(/[^\d+]/g, '');
+            // ensure it starts with +880 or 880 or 01...
+            if (!cleaned.startsWith('+')) {
+                if (cleaned.startsWith('880')) {
+                    cleaned = '+' + cleaned;
+                } else if (cleaned.startsWith('01')) {
+                    cleaned = '+88' + cleaned;      // 01........ -> +8801........
+                } else if (cleaned.startsWith('1')) {
+                    cleaned = '+880' + cleaned;     // rare but safe
+                } else {
+                    // fallback: just add +88 (maybe number stored without any prefix)
+                    cleaned = '+88' + cleaned;
+                }
+            }
+            return cleaned;
+        }
+
+        // For WhatsApp we need wa.me/ followed by country code without plus? Actually wa.me/ accepts + but we will output with +88 as per request: "wa.me/ এটার পর যেন +88 ব্যবহার করা হয়"
+        // WhatsApp web URL: https://wa.me/+8801XXXXXXXXX works perfectly.
+        function cleanPhoneForWhatsApp(phoneRaw) {
+            let cleaned = cleanPhoneForTel(phoneRaw);  // returns with +880 or +88 etc
+            // if somehow still doesn't have +88 prefix, add it (but cleanPhoneForTel already does)
+            if (cleaned && !cleaned.startsWith('+88') && cleaned.startsWith('+')) {
+                // maybe +8801... already correct, keep it. 
+                // But requirement: wa.me/ এর পর +88 ব্যবহার করতে হবে। means final number should have +88 prefix.
+                // If number is +8801..., that's perfect (includes +88). If it's +880, also fine.
+            }
+            // ensure it has +88 prefix (BD number). If number is international style we keep as is.
+            if (cleaned && !cleaned.startsWith('+88')) {
+                // add +88 only if it's a BD number pattern (starts with 01 after cleaning?) 
+                // but better to force +88 for any number that looks local
+                if (cleaned.replace(/\D/g,'').length === 10) { // exactly 10 digits -> 01xxxxxxxx
+                    cleaned = '+88' + cleaned.replace(/\D/g,'');
+                } else if (cleaned.replace(/\D/g,'').length === 11 && cleaned.replace(/\D/g,'')[0] === '0') {
+                    cleaned = '+88' + cleaned.replace(/\D/g,'').substring(1); // remove leading 0
+                }
+            }
+            return cleaned;
+        }
+
+        // email mailto link
+        function formatEmailLink(email) {
+            if (!email || email === '' || email === 'ইমেইল নেই') return '#';
+            return `mailto:${email}`;
+        }
+
+        // Load donors
+        async function loadDonors() {
+            showLoading();
+            try {
+                const snapshot = await db.collection('members').get();
+                allDonors = [];
+                
+                snapshot.forEach(doc => {
+                    const member = { id: doc.id, ...doc.data() };
+                    
+                    // Include only blood donors
+                    if (member.bloodGroup && member.bloodDonation === 'yes') {
+                        // Format data
+                        member.banglaName = member.banglaName || member.fullName || 'নাম পাওয়া যায়নি';
+                        member.mobile = member.mobile || member.phone || 'No Number';
+                        member.email = member.email || ''; 
+                        member.rank = member.rank || 'সদস্য';
+                        
+                        let presentAddress = '';
+                        if (member.presentUpazila && member.presentDistrict) {
+                            presentAddress = `${member.presentUpazila}, ${member.presentDistrict}`;
+                        } else if (member.presentUpazila) {
+                            presentAddress = member.presentUpazila;
+                        } else if (member.presentDistrict) {
+                            presentAddress = member.presentDistrict;
+                        } else {
+                            presentAddress = 'এলাকা উল্লেখ নেই';
+                        }
+                        member.presentAddress = presentAddress;
+                        
+                        member.badges = member.badges || [];
+                        member.facebook = member.facebook || ''; 
+                        
+                        member.initial = member.banglaName.charAt(0);
+                        
+                        allDonors.push(member);
+                    }
+                });
+
+                allDonors.sort((a, b) => a.banglaName.localeCompare(b.banglaName));
+                filteredDonors = [...allDonors];
+                updateStats();
+                renderDonors();
+            } catch (error) {
+                console.error('Error loading donors:', error);
+                grid.innerHTML = `<div class="no-result"><i class="fas fa-exclamation-triangle"></i><br>তথ্য লোড করতে সমস্যা হয়েছে<br><small>পুনরায় চেষ্টা করুন</small></div>`;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            totalDonorsSpan.textContent = allDonors.length;
+            activeDonorsSpan.textContent = allDonors.length;
+            const groups = new Set(allDonors.map(d => d.bloodGroup));
+            bloodGroupsCountSpan.textContent = groups.size;
+        }
+
+        // Render donor cards
+        function renderDonors() {
+            if (filteredDonors.length === 0) {
+                grid.innerHTML = `<div class="no-result"><i class="fas fa-search" style="font-size:3rem; opacity:0.5;"></i><br>কোনো রক্তদাতা পাওয়া যায়নি<br>অনুগ্রহ করে ভিন্ন ব্লাড গ্রুপ বা কিওয়ার্ড দিয়ে অনুসন্ধান করুন।</div>`;
+                return;
+            }
+
+            let html = '';
+            filteredDonors.forEach(donor => {
+                const badges = donor.badges.slice(0, 3).map(b => 
+                    `<span class="badge"><i class="fas fa-award"></i> ${b}</span>`
+                ).join('');
+
+                const avatarContent = donor.photo 
+                    ? `<img src="${donor.photo}" alt="${donor.banglaName}" onerror="this.src='https://via.placeholder.com/70'">`
+                    : donor.initial;
+
+                const hasFb = donor.facebook;
+                const fbUrl = donor.facebook || '';
+
+                // Prepare cleaned numbers for WhatsApp and tel
+                const rawPhone = donor.mobile && donor.mobile !== 'No Number' ? donor.mobile : '';
+                const telHref = rawPhone ? `tel:${cleanPhoneForTel(rawPhone)}` : '#';
+                // WhatsApp link: always ensure +88 prefix. we use cleanPhoneForWhatsApp
+                const waNumber = rawPhone ? cleanPhoneForWhatsApp(rawPhone) : '';
+                const waLink = waNumber ? `https://wa.me/${waNumber}` : '#';
+                // Email link
+                const emailLink = donor.email ? `mailto:${donor.email}` : '#';
+                const emailDisplay = donor.email || 'ইমেইল নেই';
+
+                html += `
+                    <div class="donor-card" data-id="${donor.id}">
+                        <div class="blood-type-badge">${donor.bloodGroup}</div>
+                        <div class="donor-header">
+                            <div class="avatar">${avatarContent}</div>
+                            <div class="donor-name">
+                                <h3 style="font-family:'Hind Siliguri';">${donor.banglaName}</h3>
+                                <p><i class="fas fa-tag"></i> ${donor.rank}</p>
+                            </div>
+                        </div>
+                        <div class="donor-details">
+                            <div class="detail-row"><i class="fas fa-map-marker-alt"></i> ${donor.presentAddress}</div>
+                            <div class="detail-row"><i class="fas fa-phone-alt"></i> ${donor.mobile || 'নম্বর নেই'}</div>
+                            <div class="detail-row"><i class="fas fa-envelope"></i> ${emailDisplay}</div>
+                            ${donor.lastDonation ? `<div class="detail-row"><i class="fas fa-calendar-alt"></i> সর্বশেষ দান: ${donor.lastDonation}</div>` : ''}
+                        </div>
+                        <div class="badge-group">${badges}</div>
+                        <div class="contact-actions">
+                            ${rawPhone ? `
+                                <button class="btn-contact contact-direct" data-id="${donor.id}"><i class="fas fa-comment"></i> <span>যোগাযোগ</span></button>
+                                <a href="${telHref}" class="btn-contact btn-call btn-icon-only" title="ফোন করুন"><i class="fas fa-phone"></i></a>
+                                <a href="${waLink}" target="_blank" class="btn-contact btn-whatsapp btn-icon-only" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                            ` : `
+                                <button class="btn-contact" disabled style="opacity:0.5;"><i class="fas fa-comment"></i> <span>যোগাযোগ</span></button>
+                            `}
+                            ${fbUrl ? `
+                                <a href="${fbUrl}" target="_blank" class="btn-contact btn-facebook btn-icon-only" title="Facebook প্রোফাইল"><i class="fab fa-facebook-f"></i></a>
+                            ` : ''}
+                            ${donor.email ? `
+                                <a href="${emailLink}" class="btn-contact" style="background:#4f46e5; border-color:#4f46e5;" title="ইমেইল"><i class="fas fa-envelope"></i></a>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+
+            // Attach contact button listeners (modal)
+            document.querySelectorAll('.contact-direct').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    const donor = filteredDonors.find(d => d.id == id);
+                    if (donor) {
+                        modalBlood.innerText = donor.bloodGroup;
+                        modalName.innerText = donor.banglaName;
+                        modalPhone.innerText = donor.mobile || 'নম্বর নেই';
+                        modalEmail.innerText = donor.email ? `📧 ${donor.email}` : '📧 ইমেইল নেই';
+                        modalAddress.innerText = `📍 ${donor.presentAddress}`;
+                        // Set data attribute with clean phone for call button inside modal
+                        const cleanPhone = donor.mobile ? cleanPhoneForTel(donor.mobile) : '';
+                        callDirectBtn.setAttribute('data-phone', cleanPhone);
+                        modal.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Filter by blood group
+        function filterBloodGroup(group) {
+            currentBloodFilter = group;
+            
+            document.querySelectorAll('.blood-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-blood') === group) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            applyFilters();
+        }
+
+        // Search handler
+        function handleSearch() {
+            searchText = searchInput.value.trim().toLowerCase();
+            applyFilters();
+        }
+
+        // Apply all filters
+        function applyFilters() {
+            filteredDonors = allDonors.filter(donor => {
+                if (currentBloodFilter !== 'all' && donor.bloodGroup !== currentBloodFilter) return false;
+                if (searchText !== '') {
+                    const searchable = `${donor.banglaName} ${donor.fullName || ''} ${donor.mobile || ''} ${donor.presentAddress || ''} ${donor.email || ''}`.toLowerCase();
+                    if (!searchable.includes(searchText)) return false;
+                }
+                return true;
+            });
+            renderDonors();
+        }
+
+        // Loading controls
+        function showLoading() {
+            loadingSpinner.style.display = 'block';
+            grid.style.display = 'none';
+        }
+
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+            grid.style.display = 'grid';
+        }
+
+        // Event listeners
+        document.querySelectorAll('.blood-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBloodGroup(btn.getAttribute('data-blood'));
+            });
+        });
+
+        searchInput.addEventListener('input', handleSearch);
+
+        // Modal controls
+        callDirectBtn.addEventListener('click', () => {
+            const phone = callDirectBtn.getAttribute('data-phone');
+            if (phone && phone !== '' && phone !== 'নম্বর নেই') {
+                window.location.href = `tel:${phone}`;
+            }
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadDonors);
+    </script>
+</body>
+</html>
