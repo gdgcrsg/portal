@@ -897,6 +897,54 @@
   font-size: 12px;
 }
 
+
+
+/* Footer */
+.footer { 
+  background: #f8fafc; 
+  padding: 20px 15px; 
+  text-align: center; 
+  font-size: 14px; 
+  color: #333; 
+  border-top: 1px solid #ddd; 
+  margin-top: 30px; 
+}
+
+.footer a { 
+  color: #2563eb; 
+  text-decoration: none; 
+  font-weight: 500; 
+}
+
+.footer a:active { 
+  color: #3b82f6; 
+}
+
+.developer { 
+  margin-top: 15px; 
+  display: flex; 
+  flex-wrap: wrap; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 12px; 
+  font-size: 13px; 
+  color: #444; 
+}
+
+.developer img { 
+  width: 44px; 
+  height: 44px; 
+  border-radius: 50%; 
+  border: 2px solid #3b82f6; 
+  object-fit: cover; 
+  transition: transform 0.3s ease; 
+}
+
+.developer img:hover {
+  transform: translate(93px, -337px) scale(7.2);
+  box-shadow: 0 6px 18px rgba(59,130,246,0.4);
+}
+
 .form-actions {
   display: flex;
   gap: 10px;
@@ -1157,21 +1205,30 @@ window.onclick = function(event) {
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-logo">
-                <img src="https://i.ibb.co/KHwCKpF/1000003810.png" alt="Rover Logo">
-                <span>গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</span>
-            </div>
-            
-        </div>
-        <div style="text-align:center; margin-top:3rem; opacity:0.6;">© <span id="currentYear"></span> গুরুদয়াল কলেজ রোভার — রক্ত দিন, জীবন বাঁচান।</div>
+<div class="footer">
+  <p>© <span id="year"></span> | All Rights Reserved <br>
+    <a href="https://www.facebook.com/groups/gdcrover/?ref=share&mibextid=NSMWBT" target="_blank">
+      Gurudayal Govt. College Rover Scout Group
+    </a>
+  </p>
+  <div class="developer">
+    <a href="https://rovermdashfaq.github.io/portfolio/" target="_blank">
+      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhCDeXufBywGlGcvjFv5OaZNnGnIFboYZgUyo9NPcDt7SH5dWhG6Kv7wOtGMm5uBfA-2RCI41U0IWscQhEPQ9_6mHg192N68FaFDDE4HIfb8zXw6Ubafj329ToS6mYTqHo8Wu8aRidwjczDQZ4Id_t7K-E32b8ZthoHTIH3r86pWwfOmFdNvgcQOOeHBDc/s2000/1000038033.png" alt="Developer">
+    </a>
+    <div>
+      <strong>Developed by</strong><br>
+      <a href="https://rovermdashfaq.github.io/portfolio/" target="_blank" style="text-decoration:none; color:inherit;">
+        Md. Ashfaqur Rahman Tanim
+      </a>
+      <p style="font-size:11px; margin:2px 0;">Rover Mate (Unit-3)</p>
+      <p style="font-size:9px; margin:0;">Gurudayal Govt. College Rover Scout Group</p>
+    </div>
+  </div>
+</div>
 
 <script>
-    document.getElementById('currentYear').innerText = new Date().getFullYear();
+  document.getElementById("year").textContent = new Date().getFullYear();
 </script>
-    </footer>
 
     <script>
         // Firebase Config
