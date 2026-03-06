@@ -749,7 +749,11 @@
             <div class="footer-links">
                 <a href="#">হোম</a> <a href="#">আমাদের সম্পর্কে</a> <a href="#">কার্যক্রম</a> <a href="#">সদস্য</a> <a href="#">এডমিন</a>
             </div>
-            <div class="copyright">&copy; 2026 গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</div>
+            <div class="copyright">&copy; <span id="current-year"></span> গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ</div>
+
+<script>
+  document.getElementById("current-year").textContent = new Date().getFullYear();
+</script>
         </div>
     </footer>
 
