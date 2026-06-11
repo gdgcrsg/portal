@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>48th Anniversary Profile Maker | Gurudayal Govt. College Rover Scout Group</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Open Graph / Facebook Meta Tags (FIXED) -->
+<meta property="og:title" content="গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ-প্রতিষ্ঠা বার্ষিকী">
+<meta property="og:description" content="গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপের প্রতিষ্ঠা বার্ষিকী উৎযাপন করতে নিজের ছবি দিয়ে বিশেষ প্রতিষ্ঠা বার্ষিকী ছবি বানাও">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gdgcrsg.github.io/anniversary/">  <!-- CHANGED from /circular/ to /portal/ -->
+<meta property="og:image" content="https://i.ibb.co/VYYLnYnM/1000007492.jpg">
+<meta property="og:image:width" content="1376">  <!-- ADDED for better Facebook display -->
+<meta property="og:image:height" content="768">  <!-- ADDED for better Facebook display -->
+<meta property="og:site_name" content="গুরুদয়াল সরকারি কলেজ রোভার স্কাউট গ্রুপ-প্রতিষ্ঠা বার্ষিকী">  <!-- ADDED -->
+<meta property="og:locale" content="bn_BD">  <!-- ADDED for Bengali language -->
+
     <style>
         /* আপনার আগের সব CSS একই থাকবে */
         :root {
@@ -41,6 +52,55 @@
             margin: 0 auto;
             padding: 20px;
         }
+        /* ----- ADMIN BUTTON (TOP RIGHT CORNER) ----- */
+        .admin-login-btn {
+            position: fixed;
+            top: 18px;
+            right: 20px;
+            z-index: 9999;
+            background: linear-gradient(135deg, #1e2a3a, #0f172a);
+            backdrop-filter: blur(6px);
+            border-radius: 40px;
+            padding: 8px 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            border: 1px solid rgba(255,215,0,0.4);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            color: #ffec99;
+            cursor: pointer;
+        }
+
+        .admin-login-btn i {
+            font-size: 16px;
+            color: #ffd966;
+        }
+
+        .admin-login-btn:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #0f172a, #1e2a3a);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+            border-color: rgba(255,215,0,0.8);
+            color: #fff3bf;
+        }
+
+        /* Responsive adjustment: on very small screens */
+        @media (max-width: 640px) {
+            .admin-login-btn {
+                top: 12px;
+                right: 12px;
+                padding: 6px 14px;
+                font-size: 12px;
+            }
+            .admin-login-btn i {
+                font-size: 12px;
+            }
+        }
 
         /* Header Styles */
         .header {
@@ -58,6 +118,7 @@
             justify-content: center;
             align-items: center;
             margin-bottom: 15px;
+            
         }
 
         .logo {
@@ -521,10 +582,18 @@
 
         .section-title {
             font-weight: 700;
-            text-decoration: underline;
-            margin: 20px 0 10px;
+            
+            margin: 10px 0 10px;
             color: var(--accent);
         }
+        .social-section {
+    outline: 1px solid green;  /* Thin green outline */
+    /* Optional: Add some padding so the outline doesn't touch the content */
+    padding: 5px;
+    /* Optional: Rounded corners for the outline */
+    border-radius: 12px;
+    margin-top: 20px;
+}
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -711,6 +780,14 @@
 </head>
 <body>
     <div class="container">
+              <!-- ADMIN LOGIN BUTTON - TOP RIGHT CORNER (Fixed) -->
+        <a href="https://gdgcrsg.github.io/portal/Anniversary/Admin-Panel.html" 
+           class="admin-login-btn" 
+           target="_blank" 
+           rel="noopener noreferrer">
+            <i class="fas fa-user-shield"></i> 
+            <span>Admin Login</span>
+        </a>
         <!-- Header -->
         <header class="header">
             <div class="logo-container">
@@ -720,11 +797,117 @@
             </div>
             
             <h1>Gurudayal Govt. College Rover Scout Group</h1>
-            <div class="anniversary-badge">48th Anniversary</div>
+            <div class="anniversary-badge" id="anniversaryBadge"></div>
+<div style="color: #006400; text-align: center; font-family: monospace; font-size: 16px; margin-top: -5px; font-weight: bold;" id="countdownTimer"></div>
+
+<script>
+  function updateAnniversary() {
+    const foundingYear = 1977;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    
+    // Calculate anniversary number and next anniversary date
+    let anniversaryNumber;
+    let nextAnniversaryDate;
+    
+    const thisYearAnniversary = new Date(currentYear, 10, 4); // Nov 4 (month is 0-indexed)
+    
+    if (now >= thisYearAnniversary) {
+      // If anniversary has passed or is today
+      if (now.toDateString() === thisYearAnniversary.toDateString()) {
+        // TODAY is the anniversary
+        anniversaryNumber = currentYear - foundingYear;
+        let suffix = getOrdinalSuffix(anniversaryNumber);
+        document.getElementById('anniversaryBadge').textContent = 
+          `Happy ${anniversaryNumber}${suffix} Anniversary! 🎉`;
+        document.getElementById('countdownTimer').textContent = "🎊 Let's Celebrate! 🎊";
+        return;
+      }
+      // Anniversary passed, prepare for next year
+      anniversaryNumber = currentYear - foundingYear + 1;
+      nextAnniversaryDate = new Date(currentYear + 1, 10, 4);
+    } else {
+      // Anniversary hasn't passed yet
+      anniversaryNumber = currentYear - foundingYear;
+      nextAnniversaryDate = thisYearAnniversary;
+    }
+    
+    // Calculate 6 months before anniversary
+    const countdownStart = new Date(nextAnniversaryDate);
+    countdownStart.setMonth(countdownStart.getMonth() - 6); // 6 months before
+    
+    let suffix = getOrdinalSuffix(anniversaryNumber);
+    
+    // Check if we're within 6 months countdown period
+    if (now >= countdownStart && now < nextAnniversaryDate) {
+      // Show countdown
+      document.getElementById('anniversaryBadge').textContent = 
+        `Countdown to ${anniversaryNumber}${suffix} Anniversary`;
+      updateCountdown(nextAnniversaryDate);
+    } else {
+      // More than 6 months away
+      document.getElementById('anniversaryBadge').textContent = 
+        `${anniversaryNumber}${suffix} Anniversary`;
+      document.getElementById('countdownTimer').textContent = 
+        `Countdown starts ${countdownStart.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+    }
+  }
+
+  function getOrdinalSuffix(number) {
+    const lastDigit = number % 10;
+    const lastTwoDigits = number % 100;
+    
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+      return 'th';
+    } else if (lastDigit === 1) {
+      return 'st';
+    } else if (lastDigit === 2) {
+      return 'nd';
+    } else if (lastDigit === 3) {
+      return 'rd';
+    } else {
+      return 'th';
+    }
+  }
+
+  function updateCountdown(targetDate) {
+    const now = new Date();
+    const diff = targetDate - now;
+    
+    if (diff <= 0) return;
+    
+    // Calculate time units
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    // Format with leading zeros
+    const formattedDays = String(days).padStart(2, '0');
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+    
+    document.getElementById('countdownTimer').textContent = 
+      `${formattedDays}d:${formattedHours}hr:${formattedMinutes}min:${formattedSeconds}sec`
+  }
+
+  // Update on page load
+  updateAnniversary();
+  
+  // Update every second
+  setInterval(updateAnniversary, 1000);
+</script>
             <p>Celebrate our glory and tradition in the 48th year of journey</p>
             <p style="text-align:center; font-size:12px; font-weight:bold; color:#808080;">From 1977 to Present</p>
             
-            <div class="anniversary-date">4th November 2025</div>
+            <div class="anniversary-date">
+  4th November, <span id="current-year"></span>
+</div>
+
+<script>
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+</script>
         </header>
 
         <!-- Main Content -->
@@ -1124,33 +1307,36 @@
                 <a href="https://facebook.com/groups/gdcrover/" target="_blank">Gurudoyal Govt. College Rover Scout Group</a>
             </div>
             
-            <div class="section-title">My Personal Social Accounts</div>
-            <div class="social-icons">
-                <a href="https://www.facebook.com/MD.Ashfaq01" target="_blank" class="social-icon">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://www.instagram.com/md.ashfaq01" target="_blank" class="social-icon">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="https://www.tiktok.com/@mdashfaq.king?_t=ZS-8zQHzCpJy9H&_r=1" target="_blank" class="social-icon">
-                    <i class="fab fa-tiktok"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/md-ashfaqur-rahman-tanim-407805290" target="_blank" class="social-icon">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a href="https://wa.me/qr/3ITBKA5Y5SUSI1" target="_blank" class="social-icon">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-                <a href="mailto:mdashfaqurrahmantanim@gmail.com" target="_blank" class="social-icon">
-                    <i class="fas fa-envelope"></i>
-                </a>
-                <a href="https://www.youtube.com/@md.ashfaq01" target="_blank" class="social-icon">
-                    <i class="fab fa-youtube"></i>
-                </a>
-                <a href="https://rovermdashfaq.github.io/portfolio/" target="_blank" class="social-icon">
-                    <i class="fas fa-globe"></i>
-                </a>
-            </div>
+            <div class="social-section">
+    <div class="section-title" style="bold;"><u>My Personal Social Accounts</u></div>
+    <div class="social-icons">
+        <a href="https://www.facebook.com/MD.Ashfaq01" target="_blank" class="social-icon">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com/md.ashfaq01" target="_blank" class="social-icon">
+            <i class="fab fa-instagram"></i>
+        </a>
+         <a href="https://wa.me/qr/3ITBKA5Y5SUSI1" target="_blank" class="social-icon">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="https://www.tiktok.com/@mdashfaq.king?_t=ZS-8zQHzCpJy9H&_r=1" target="_blank" class="social-icon">
+            <i class="fab fa-tiktok"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/md-ashfaqur-rahman-tanim-407805290" target="_blank" class="social-icon">
+            <i class="fab fa-linkedin-in"></i>
+        </a>
+       
+        <a href="mailto:mdashfaqurrahmantanim@gmail.com" target="_blank" class="social-icon">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="https://www.youtube.com/@md.ashfaq01" target="_blank" class="social-icon">
+            <i class="fab fa-youtube"></i>
+        </a>
+        <a href="https://rovermdashfaq.github.io/portfolio/" target="_blank" class="social-icon">
+            <i class="fas fa-globe"></i>
+        </a>
+    </div>
+</div>
         </footer>
     </div>
 
